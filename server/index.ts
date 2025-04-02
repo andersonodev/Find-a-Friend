@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { createTables, migrateSampleData } from "./migrations";
 
 const app = express();
 app.use(express.json());
@@ -37,6 +38,19 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  try {
+    // If PostgreSQL is enabled, run database migrations
+    if (process.env.DATABASE_URL && process.env.USE_POSTGRES !== 'false') {
+      log('Running database migrations...');
+      await createTables();
+      await migrateSampleData();
+      log('Database migrations completed successfully');
+    }
+  } catch (error) {
+    log(`Error running database migrations: ${error}`);
+    // Continue with server startup even if migrations fail
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
