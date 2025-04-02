@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { loginWithEmail } from "@/lib/firebase";
+import { loginWithEmail, loginWithGoogle } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import {
   Form,
@@ -35,6 +35,7 @@ export default function Login() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
   // Check for redirect param in URL
@@ -76,6 +77,8 @@ export default function Login() {
         errorMessage = "O endereço de email é inválido.";
       } else if (error.code === "auth/network-request-failed") {
         errorMessage = "Erro de conexão. Verifique sua conexão com a internet.";
+      } else if (error.code === "auth/configuration-not-found") {
+        errorMessage = "Erro de configuração. O método de login escolhido não está disponível.";
       }
       
       toast({
@@ -84,9 +87,47 @@ export default function Login() {
         variant: "destructive",
       });
       
-      console.error("Login error:", error);
+      console.error("Erro de login:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+  
+  // Login com Google
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    
+    try {
+      await loginWithGoogle();
+      
+      toast({
+        title: "Login com Google realizado com sucesso!",
+        description: "Bem-vindo de volta ao RentAFriend.",
+      });
+      
+      navigate(redirectUrl);
+    } catch (error: any) {
+      let errorMessage = "Ocorreu um erro ao fazer login com Google. Tente novamente.";
+      
+      if (error.code === "auth/popup-closed-by-user") {
+        errorMessage = "Login cancelado. Você fechou a janela de login.";
+      } else if (error.code === "auth/popup-blocked") {
+        errorMessage = "Popup bloqueado. Por favor, permita popups para este site.";
+      } else if (error.code === "auth/cancelled-popup-request") {
+        errorMessage = "Operação cancelada. Tente novamente.";
+      } else if (error.code === "auth/configuration-not-found") {
+        errorMessage = "Erro de configuração. O login com Google não está configurado corretamente.";
+      }
+      
+      toast({
+        title: "Falha no login com Google",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      console.error("Erro de login com Google:", error);
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
   
@@ -194,7 +235,7 @@ export default function Login() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={isLoading}
+                    disabled={isLoading || isGoogleLoading}
                   >
                     {isLoading ? "Entrando..." : "Entrar"}
                   </Button>
@@ -213,28 +254,38 @@ export default function Login() {
               <Button
                 variant="outline"
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
+                onClick={handleGoogleLogin}
               >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                  <path d="M1 1h22v22H1z" fill="none" />
-                </svg>
-                Continuar com Google
+                {isGoogleLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2" />
+                    Processando...
+                  </div>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                      <path d="M1 1h22v22H1z" fill="none" />
+                    </svg>
+                    Continuar com Google
+                  </>
+                )}
               </Button>
             </CardContent>
             <CardFooter className="flex justify-center">

@@ -1,7 +1,9 @@
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { Mail, Phone, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
 
 export default function Footer() {
+  const [, navigate] = useLocation();
+  
   return (
     <footer className="bg-neutral-800 text-white pt-12 pb-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -12,18 +14,18 @@ export default function Footer() {
               Conectando pessoas e criando experiências memoráveis em todo o Brasil.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-neutral-400 hover:text-white transition">
+              <span className="text-neutral-400 hover:text-white transition cursor-pointer">
                 <span className="sr-only">Facebook</span>
                 <Facebook className="h-6 w-6" />
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition">
+              </span>
+              <span className="text-neutral-400 hover:text-white transition cursor-pointer">
                 <span className="sr-only">Instagram</span>
                 <Instagram className="h-6 w-6" />
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition">
+              </span>
+              <span className="text-neutral-400 hover:text-white transition cursor-pointer">
                 <span className="sr-only">Twitter</span>
                 <Twitter className="h-6 w-6" />
-              </a>
+              </span>
             </div>
           </div>
           
@@ -31,39 +33,44 @@ export default function Footer() {
             <h3 className="text-lg font-bold mb-4">Navegação</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Página Inicial
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/")}
+                >
+                  Página Inicial
+                </span>
               </li>
               <li>
-                <Link href="/how-it-works">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Como Funciona
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/how-it-works")}
+                >
+                  Como Funciona
+                </span>
               </li>
               <li>
-                <Link href="/search">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Buscar Amigos
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/search")}
+                >
+                  Buscar Amigos
+                </span>
               </li>
               <li>
-                <Link href="/become-amigo">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Tornar-se um Amigo
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/become-amigo")}
+                >
+                  Tornar-se um Amigo
+                </span>
               </li>
               <li>
-                <Link href="/blog">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Blog
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/blog")}
+                >
+                  Blog
+                </span>
               </li>
             </ul>
           </div>
@@ -72,39 +79,44 @@ export default function Footer() {
             <h3 className="text-lg font-bold mb-4">Informações</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/about">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Sobre Nós
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/about")}
+                >
+                  Sobre Nós
+                </span>
               </li>
               <li>
-                <Link href="/privacy">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Política de Privacidade
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/privacy")}
+                >
+                  Política de Privacidade
+                </span>
               </li>
               <li>
-                <Link href="/terms">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Termos de Uso
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/terms")}
+                >
+                  Termos de Uso
+                </span>
               </li>
               <li>
-                <Link href="/partners">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    Parcerias
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/partners")}
+                >
+                  Parcerias
+                </span>
               </li>
               <li>
-                <Link href="/faq">
-                  <a className="text-neutral-400 hover:text-white transition">
-                    FAQ
-                  </a>
-                </Link>
+                <span 
+                  className="text-neutral-400 hover:text-white transition cursor-pointer"
+                  onClick={() => navigate("/faq")}
+                >
+                  FAQ
+                </span>
               </li>
             </ul>
           </div>
