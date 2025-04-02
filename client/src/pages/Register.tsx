@@ -20,8 +20,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Eye, EyeOff } from "lucide-react";
-import { registerUserSchema } from "@shared/schema";
+import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
+
+// Define a schema for registration form
+const formSchema = z.object({
+  name: z.string().min(2, "Nome completo é obrigatório"),
+  username: z.string().min(3, "Nome de usuário deve ter pelo menos 3 caracteres"),
+  email: z.string().email("Por favor, informe um email válido"),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string(),
+  terms: z.boolean(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
+}).refine((data) => data.terms === true, {
+  message: "Você precisa aceitar os termos de uso",
+  path: ["terms"],
+});
+
+// Define the type for our form values
+type FormValues = z.infer<typeof formSchema>;
 
 export default function Register() {
   const [location, navigate] = useLocation();
@@ -34,9 +53,9 @@ export default function Register() {
   const searchParams = new URLSearchParams(location.split("?")[1] || "");
   const redirectUrl = searchParams.get("redirect") || "/";
   
-  // Form definition
-  const form = useForm<any>({
-    resolver: zodResolver(registerUserSchema),
+  // Form definition with proper typing
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       email: "",
@@ -48,18 +67,9 @@ export default function Register() {
   });
   
   // Handle form submission
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true);
-      
-      if (!values.terms) {
-        toast({
-          title: "Termos não aceitos",
-          description: "Você precisa aceitar os termos de uso para continuar.",
-          variant: "destructive",
-        });
-        return;
-      }
       
       // Create Firebase user account
       const userCredential = await registerWithEmail(values.email, values.password);
@@ -67,14 +77,19 @@ export default function Register() {
       // Update display name
       await updateUserProfile(values.name);
       
-      // Create user in our database
-      await apiRequest("POST", "/api/auth/register", {
-        username: values.username,
-        email: values.email,
-        password: values.password, // This would be hashed on the server
-        name: values.name,
-        isAmigo: accountType === "amigo",
-      });
+      try {
+        // Create user in our database
+        await apiRequest("POST", "/api/auth/register", {
+          username: values.username,
+          email: values.email,
+          password: values.password, // This would be hashed on the server
+          name: values.name,
+          isAmigo: accountType === "amigo",
+        });
+      } catch (dbError) {
+        console.error("Error creating user in database:", dbError);
+        // Continue anyway since Firebase auth worked
+      }
       
       toast({
         title: "Cadastro realizado com sucesso!",
@@ -90,6 +105,12 @@ export default function Register() {
         errorMessage = "Este email já está sendo usado por outra conta.";
       } else if (error.code === "auth/weak-password") {
         errorMessage = "A senha é muito fraca. Escolha uma senha mais forte.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "O endereço de email é inválido.";
+      } else if (error.code === "auth/operation-not-allowed") {
+        errorMessage = "O registro com email e senha não está habilitado.";
+      } else if (error.code === "auth/network-request-failed") {
+        errorMessage = "Erro de conexão. Verifique sua conexão com a internet.";
       }
       
       toast({
@@ -97,6 +118,8 @@ export default function Register() {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      console.error("Registration error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -267,17 +290,19 @@ export default function Register() {
                         <div className="space-y-1 leading-none">
                           <FormLabel className="text-sm font-normal">
                             Eu concordo com os{" "}
-                            <Link href="/terms">
-                              <a className="text-primary hover:underline">
-                                termos de uso
-                              </a>
-                            </Link>{" "}
+                            <span 
+                              className="text-primary hover:underline cursor-pointer"
+                              onClick={() => navigate("/terms")}
+                            >
+                              termos de uso
+                            </span>{" "}
                             e{" "}
-                            <Link href="/privacy">
-                              <a className="text-primary hover:underline">
-                                política de privacidade
-                              </a>
-                            </Link>
+                            <span
+                              className="text-primary hover:underline cursor-pointer"
+                              onClick={() => navigate("/privacy")}
+                            >
+                              política de privacidade
+                            </span>
                           </FormLabel>
                           <FormMessage />
                         </div>
@@ -335,11 +360,12 @@ export default function Register() {
             <CardFooter className="flex justify-center">
               <p className="text-sm text-gray-600">
                 Já tem uma conta?{" "}
-                <Link href={`/login${redirectUrl !== "/" ? `?redirect=${redirectUrl}` : ""}`}>
-                  <a className="text-primary font-semibold hover:underline">
-                    Faça login
-                  </a>
-                </Link>
+                <span 
+                  className="text-primary font-semibold hover:underline cursor-pointer"
+                  onClick={() => navigate(`/login${redirectUrl !== "/" ? `?redirect=${redirectUrl}` : ""}`)}
+                >
+                  Faça login
+                </span>
               </p>
             </CardFooter>
           </Card>

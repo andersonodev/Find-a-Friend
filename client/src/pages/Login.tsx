@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { useState } from "react";
+import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,7 +20,16 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Eye, EyeOff } from "lucide-react";
-import { loginSchema } from "@shared/schema";
+
+// Login form schema
+const loginFormSchema = z.object({
+  email: z.string().email("Por favor, informe um email válido"),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+  remember: z.boolean().optional(),
+});
+
+// Type for our form values
+type FormValues = z.infer<typeof loginFormSchema>;
 
 export default function Login() {
   const [location, navigate] = useLocation();
@@ -32,17 +41,18 @@ export default function Login() {
   const searchParams = new URLSearchParams(location.split("?")[1] || "");
   const redirectUrl = searchParams.get("redirect") || "/";
   
-  // Form definition
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  // Form definition with proper typing
+  const form = useForm<FormValues>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
+      remember: false,
     },
   });
   
   // Handle form submission
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     
     try {
@@ -62,6 +72,10 @@ export default function Login() {
         errorMessage = "Email ou senha incorretos. Verifique suas credenciais.";
       } else if (error.code === "auth/too-many-requests") {
         errorMessage = "Muitas tentativas de login. Tente novamente mais tarde.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "O endereço de email é inválido.";
+      } else if (error.code === "auth/network-request-failed") {
+        errorMessage = "Erro de conexão. Verifique sua conexão com a internet.";
       }
       
       toast({
@@ -69,6 +83,8 @@ export default function Login() {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -146,21 +162,33 @@ export default function Login() {
                   />
                   
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="remember" />
-                      <label
-                        htmlFor="remember"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Lembrar-me
-                      </label>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="remember"
+                      render={({ field }) => (
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="remember" 
+                            checked={field.value} 
+                            onCheckedChange={field.onChange}
+                            disabled={isLoading}
+                          />
+                          <label
+                            htmlFor="remember"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Lembrar-me
+                          </label>
+                        </div>
+                      )}
+                    />
                     
-                    <Link href="/forgot-password">
-                      <a className="text-sm text-primary hover:underline">
-                        Esqueceu a senha?
-                      </a>
-                    </Link>
+                    <span 
+                      className="text-sm text-primary hover:underline cursor-pointer"
+                      onClick={() => navigate("/forgot-password")}
+                    >
+                      Esqueceu a senha?
+                    </span>
                   </div>
                   
                   <Button
@@ -212,11 +240,12 @@ export default function Login() {
             <CardFooter className="flex justify-center">
               <p className="text-sm text-gray-600">
                 Ainda não tem uma conta?{" "}
-                <Link href={`/register${redirectUrl !== "/" ? `?redirect=${redirectUrl}` : ""}`}>
-                  <a className="text-primary font-semibold hover:underline">
-                    Cadastre-se
-                  </a>
-                </Link>
+                <span 
+                  className="text-primary font-semibold hover:underline cursor-pointer"
+                  onClick={() => navigate(`/register${redirectUrl !== "/" ? `?redirect=${redirectUrl}` : ""}`)}
+                >
+                  Cadastre-se
+                </span>
               </p>
             </CardFooter>
           </Card>

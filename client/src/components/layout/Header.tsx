@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ interface HeaderProps {
 }
 
 export default function Header({ user }: HeaderProps) {
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
   const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -31,14 +31,14 @@ export default function Header({ user }: HeaderProps) {
     try {
       await logout();
       toast({
-        title: "Logout successful",
-        description: "You have been logged out successfully",
+        title: "Logout realizado com sucesso",
+        description: "Você foi desconectado da sua conta",
       });
-      setLocation("/");
+      navigate("/");
     } catch (error) {
       toast({
-        title: "Logout failed",
-        description: "An error occurred while logging out",
+        title: "Falha ao desconectar",
+        description: "Ocorreu um erro ao fazer logout",
         variant: "destructive",
       });
     }
@@ -49,27 +49,33 @@ export default function Header({ user }: HeaderProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
-            <Link href="/">
-              <a className="text-primary font-heading font-bold text-2xl">RentAFriend</a>
-            </Link>
+            <span 
+              className="text-primary font-heading font-bold text-2xl cursor-pointer"
+              onClick={() => navigate("/")}
+            >
+              RentAFriend
+            </span>
           </div>
           
           <div className="hidden md:flex space-x-6 items-center">
-            <Link href="/how-it-works">
-              <a className="text-neutral-800 hover:text-primary transition font-medium">
-                Como Funciona
-              </a>
-            </Link>
-            <Link href="/become-amigo">
-              <a className="text-neutral-800 hover:text-primary transition font-medium">
-                Tornar-se um Amigo
-              </a>
-            </Link>
-            <Link href="/help">
-              <a className="text-neutral-800 hover:text-primary transition font-medium">
-                Ajuda
-              </a>
-            </Link>
+            <span 
+              className="text-neutral-800 hover:text-primary transition font-medium cursor-pointer"
+              onClick={() => navigate("/how-it-works")}
+            >
+              Como Funciona
+            </span>
+            <span 
+              className="text-neutral-800 hover:text-primary transition font-medium cursor-pointer"
+              onClick={() => navigate("/become-amigo")}
+            >
+              Tornar-se um Amigo
+            </span>
+            <span 
+              className="text-neutral-800 hover:text-primary transition font-medium cursor-pointer"
+              onClick={() => navigate("/help")}
+            >
+              Ajuda
+            </span>
             
             {user ? (
               <DropdownMenu>
@@ -87,13 +93,13 @@ export default function Header({ user }: HeaderProps) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setLocation("/profile")}>
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
                     Perfil
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLocation("/bookings")}>
+                  <DropdownMenuItem onClick={() => navigate("/bookings")}>
                     Minhas Reservas
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLocation("/favorites")}>
+                  <DropdownMenuItem onClick={() => navigate("/favorites")}>
                     Favoritos
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -104,12 +110,12 @@ export default function Header({ user }: HeaderProps) {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/login">
-                  <Button variant="ghost">Entrar</Button>
-                </Link>
-                <Link href="/register">
-                  <Button>Cadastrar</Button>
-                </Link>
+                <Button variant="ghost" onClick={() => navigate("/login")}>
+                  Entrar
+                </Button>
+                <Button onClick={() => navigate("/register")}>
+                  Cadastrar
+                </Button>
               </div>
             )}
           </div>
@@ -137,71 +143,86 @@ export default function Header({ user }: HeaderProps) {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2 mb-6">
-                    <Link href="/login">
-                      <Button className="w-full" variant="outline" onClick={() => setIsMobileMenuOpen(false)}>
-                        Entrar
-                      </Button>
-                    </Link>
-                    <Link href="/register">
-                      <Button className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
-                        Cadastrar
-                      </Button>
-                    </Link>
+                    <Button 
+                      className="w-full" 
+                      variant="outline" 
+                      onClick={() => {
+                        navigate("/login");
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      Entrar
+                    </Button>
+                    <Button 
+                      className="w-full" 
+                      onClick={() => {
+                        navigate("/register");
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      Cadastrar
+                    </Button>
                   </div>
                 )}
                 
-                <Link href="/how-it-works">
-                  <a 
-                    className="text-lg font-medium py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Como Funciona
-                  </a>
-                </Link>
-                <Link href="/become-amigo">
-                  <a 
-                    className="text-lg font-medium py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Tornar-se um Amigo
-                  </a>
-                </Link>
-                <Link href="/help">
-                  <a 
-                    className="text-lg font-medium py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Ajuda
-                  </a>
-                </Link>
+                <span 
+                  className="text-lg font-medium py-2 cursor-pointer"
+                  onClick={() => {
+                    navigate("/how-it-works");
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Como Funciona
+                </span>
+                <span 
+                  className="text-lg font-medium py-2 cursor-pointer"
+                  onClick={() => {
+                    navigate("/become-amigo");
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Tornar-se um Amigo
+                </span>
+                <span 
+                  className="text-lg font-medium py-2 cursor-pointer"
+                  onClick={() => {
+                    navigate("/help");
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Ajuda
+                </span>
                 
                 {user && (
                   <>
                     <div className="h-px bg-gray-200 my-2" />
-                    <Link href="/profile">
-                      <a 
-                        className="text-lg font-medium py-2"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Perfil
-                      </a>
-                    </Link>
-                    <Link href="/bookings">
-                      <a 
-                        className="text-lg font-medium py-2"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Minhas Reservas
-                      </a>
-                    </Link>
-                    <Link href="/favorites">
-                      <a 
-                        className="text-lg font-medium py-2"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Favoritos
-                      </a>
-                    </Link>
+                    <span 
+                      className="text-lg font-medium py-2 cursor-pointer"
+                      onClick={() => {
+                        navigate("/profile");
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      Perfil
+                    </span>
+                    <span 
+                      className="text-lg font-medium py-2 cursor-pointer"
+                      onClick={() => {
+                        navigate("/bookings");
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      Minhas Reservas
+                    </span>
+                    <span 
+                      className="text-lg font-medium py-2 cursor-pointer"
+                      onClick={() => {
+                        navigate("/favorites");
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      Favoritos
+                    </span>
                     <Button 
                       variant="ghost" 
                       className="justify-start px-0 text-lg font-medium h-auto"
