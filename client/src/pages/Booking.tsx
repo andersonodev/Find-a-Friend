@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useParams, Link } from "wouter";
+import { useLocation, useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -17,41 +17,28 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MapPin, Calendar, Clock, ArrowLeft, Check } from "lucide-react";
-import { insertBookingSchema } from "@shared/schema";
-
-interface BookingProps {
-  user: any | null;
-}
-
-const bookingFormSchema = insertBookingSchema.pick({
-  clientId: true,
-  amigoId: true,
-  date: true,
-  startTime: true,
-  endTime: true,
-  location: true,
-  totalAmount: true,
-}).extend({
-  specialRequests: z.string().optional(),
-});
-
-type BookingFormValues = z.infer<typeof bookingFormSchema>;
+import { bookingFormSchema, BookingFormValues, BookingProps } from "@/shared/schema";
 
 export default function Booking({ user }: BookingProps) {
-  const [, navigate] = useLocation();
-  const { id } = useParams<{ id: string }>();
+  const navigate = useLocation()[1];
+  const { id } = useParams<{id: string}>();
   const { toast } = useToast();
   const searchParams = new URLSearchParams(window.location.search);
   const selectedDate = searchParams.get("date");
   const selectedTime = searchParams.get("time");
-  
+
   // Parse the time slot
   const [startTime, endTime] = selectedTime ? selectedTime.split(" - ") : ["", ""];
-  
+
   const { data: amigo, isLoading: isAmigoLoading } = useQuery({
     queryKey: [`/api/amigos/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/amigos/${id}`);
+      if (!response.ok) throw new Error("Failed to fetch amigo data");
+      return response.json();
+    },
   });
-  
+
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
@@ -65,7 +52,7 @@ export default function Booking({ user }: BookingProps) {
       specialRequests: "",
     },
   });
-  
+
   useEffect(() => {
     if (!user) {
       toast({
@@ -75,16 +62,16 @@ export default function Booking({ user }: BookingProps) {
       });
       navigate("/login?redirect=/amigos/" + id);
     }
-    
+
     if (amigo) {
       const hourlyRate = amigo.hourlyRate || 0;
       const serviceFee = Math.round(hourlyRate * 0.1);
       const totalAmount = hourlyRate + serviceFee;
-      
+
       form.setValue("totalAmount", totalAmount);
     }
   }, [user, amigo, id, navigate, toast, form]);
-  
+
   const onSubmit = async (data: BookingFormValues) => {
     try {
       // Format the data as needed by the API
@@ -93,15 +80,15 @@ export default function Booking({ user }: BookingProps) {
         status: "pending",
         paymentStatus: "pending",
       };
-      
+
       const response = await apiRequest("POST", "/api/bookings", bookingData);
       const booking = await response.json();
-      
+
       toast({
         title: "Reserva criada com sucesso!",
         description: "Prossiga para o pagamento para confirmar sua reserva.",
       });
-      
+
       navigate(`/checkout/${booking.id}`);
     } catch (error) {
       console.error("Error creating booking:", error);
@@ -112,7 +99,7 @@ export default function Booking({ user }: BookingProps) {
       });
     }
   };
-  
+
   if (isAmigoLoading) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -124,7 +111,7 @@ export default function Booking({ user }: BookingProps) {
       </div>
     );
   }
-  
+
   if (!amigo) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -142,30 +129,30 @@ export default function Booking({ user }: BookingProps) {
       </div>
     );
   }
-  
-  const formattedDate = selectedDate 
+
+  const formattedDate = selectedDate
     ? format(new Date(selectedDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
     : "";
-  
+
   const serviceFee = Math.round(amigo.hourlyRate * 0.1);
   const totalAmount = amigo.hourlyRate + serviceFee;
-  
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header user={user} />
-      
+
       <div className="container mx-auto px-4 py-8 flex-grow">
-        <Button 
-          variant="ghost" 
-          className="mb-6 pl-0" 
+        <Button
+          variant="ghost"
+          className="mb-6 pl-0"
           onClick={() => navigate(`/amigos/${id}`)}
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para perfil do amigo
         </Button>
-        
+
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl md:text-3xl font-heading font-bold mb-6">Finalizar reserva</h1>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
               <Card>
@@ -174,7 +161,7 @@ export default function Booking({ user }: BookingProps) {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                       <div>
                         <h2 className="text-xl font-semibold mb-4">Detalhes da reserva</h2>
-                        
+
                         <div className="space-y-4">
                           <div className="flex items-start">
                             <Calendar className="h-5 w-5 mt-0.5 mr-3 text-neutral-500" />
@@ -183,7 +170,7 @@ export default function Booking({ user }: BookingProps) {
                               <p className="text-neutral-600">{formattedDate}</p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-start">
                             <Clock className="h-5 w-5 mt-0.5 mr-3 text-neutral-500" />
                             <div>
@@ -193,12 +180,12 @@ export default function Booking({ user }: BookingProps) {
                           </div>
                         </div>
                       </div>
-                      
+
                       <Separator />
-                      
+
                       <div>
                         <h2 className="text-xl font-semibold mb-4">Local do encontro</h2>
-                        
+
                         <FormField
                           control={form.control}
                           name="location"
@@ -220,10 +207,10 @@ export default function Booking({ user }: BookingProps) {
                           )}
                         />
                       </div>
-                      
+
                       <div>
                         <h2 className="text-xl font-semibold mb-4">Informações adicionais</h2>
-                        
+
                         <FormField
                           control={form.control}
                           name="specialRequests"
@@ -231,7 +218,7 @@ export default function Booking({ user }: BookingProps) {
                             <FormItem>
                               <FormLabel>Pedidos especiais ou informações adicionais</FormLabel>
                               <FormControl>
-                                <Textarea 
+                                <Textarea
                                   placeholder="Ex: Gostaria de ir a um restaurante específico, tenho restrições alimentares, etc."
                                   className="min-h-[120px]"
                                   {...field}
@@ -242,7 +229,7 @@ export default function Booking({ user }: BookingProps) {
                           )}
                         />
                       </div>
-                      
+
                       <div className="flex justify-end">
                         <Button type="submit" className="w-full md:w-auto">
                           Prosseguir para pagamento
@@ -253,16 +240,16 @@ export default function Booking({ user }: BookingProps) {
                 </CardContent>
               </Card>
             </div>
-            
+
             <div className="md:col-span-1">
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-lg font-semibold mb-4">Resumo da reserva</h2>
-                  
+
                   <div className="flex items-center mb-4">
-                    <img 
-                      src={amigo.avatar} 
-                      alt={amigo.name} 
+                    <img
+                      src={amigo.avatar}
+                      alt={amigo.name}
                       className="w-12 h-12 rounded-full object-cover mr-3"
                     />
                     <div>
@@ -270,9 +257,9 @@ export default function Booking({ user }: BookingProps) {
                       <p className="text-sm text-neutral-600">{amigo.location}</p>
                     </div>
                   </div>
-                  
+
                   <Separator className="my-4" />
-                  
+
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between">
                       <span className="text-neutral-600">R$ {amigo.hourlyRate} x 1 hora</span>
@@ -283,9 +270,9 @@ export default function Booking({ user }: BookingProps) {
                       <span>R$ {serviceFee}</span>
                     </div>
                   </div>
-                  
+
                   <Separator className="my-4" />
-                  
+
                   <div className="flex justify-between font-bold">
                     <span>Total</span>
                     <span>R$ {totalAmount}</span>
@@ -302,7 +289,7 @@ export default function Booking({ user }: BookingProps) {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

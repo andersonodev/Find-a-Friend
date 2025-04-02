@@ -219,11 +219,11 @@ export default function Bookings({ user }: BookingsProps) {
                           
                           <div className={`mt-4 inline-flex items-center ${
                             booking.status === 'confirmed' ? 'text-green-600 bg-green-50' :
-                            booking.status === 'pending' ? 'text-yellow-600 bg-yellow-50' :
-                            'text-neutral-600 bg-neutral-100'
+                              booking.status === 'pending' ? 'text-yellow-600 bg-yellow-50' :
+                                'text-neutral-600 bg-neutral-100'
                           } px-2.5 py-1 rounded-full text-xs font-medium`}>
                             {booking.status === 'confirmed' ? 'Confirmado' :
-                             booking.status === 'pending' ? 'Pendente' : 'Agendado'}
+                              booking.status === 'pending' ? 'Pendente' : 'Agendado'}
                           </div>
                         </div>
                         

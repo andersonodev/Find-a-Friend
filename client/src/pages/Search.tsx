@@ -27,7 +27,7 @@ interface Amigo {
   // Outros campos que possam existir
 }
 
-export default function Search({user}: {user?: any}) {
+export default function Search({ user }: {user?: any}) {
   const [locationRoute, navigate] = useLocation();
   const searchParams = new URLSearchParams(locationRoute.split("?")[1] || "");
   
@@ -87,20 +87,20 @@ export default function Search({user}: {user?: any}) {
     
     // Apply sorting
     switch (sortValue) {
-      case "rating":
-        filtered.sort((a, b) => b.averageRating - a.averageRating);
-        break;
-      case "price_asc":
-        filtered.sort((a, b) => a.hourlyRate - b.hourlyRate);
-        break;
-      case "price_desc":
-        filtered.sort((a, b) => b.hourlyRate - a.hourlyRate);
-        break;
-      case "reviews":
-        filtered.sort((a, b) => b.reviewCount - a.reviewCount);
-        break;
-      default:
-        filtered.sort((a, b) => b.averageRating - a.averageRating);
+    case "rating":
+      filtered.sort((a, b) => b.averageRating - a.averageRating);
+      break;
+    case "price_asc":
+      filtered.sort((a, b) => a.hourlyRate - b.hourlyRate);
+      break;
+    case "price_desc":
+      filtered.sort((a, b) => b.hourlyRate - a.hourlyRate);
+      break;
+    case "reviews":
+      filtered.sort((a, b) => b.reviewCount - a.reviewCount);
+      break;
+    default:
+      filtered.sort((a, b) => b.averageRating - a.averageRating);
     }
     
     setSortedAmigos(filtered);

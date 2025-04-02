@@ -1,9 +1,8 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { z } from "zod";
+import { z,ZodError } from "zod";
 import { loginSchema, searchSchema, insertUserSchema, registerUserSchema, insertBookingSchema, insertReviewSchema } from "@shared/schema";
-import { ZodError } from "zod";
 import Stripe from "stripe";
 
 // Initialize Stripe
@@ -347,21 +346,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Handle different event types
       switch (event.type) {
-        case "payment_intent.succeeded":
-          const paymentIntent = event.data.object;
-          const bookingId = parseInt(paymentIntent.metadata.bookingId, 10);
+      case "payment_intent.succeeded":
+        const paymentIntent = event.data.object;
+        const bookingId = parseInt(paymentIntent.metadata.bookingId, 10);
           
-          // Update booking payment status
-          await storage.updateBookingPaymentStatus(bookingId, "paid", paymentIntent.id);
-          break;
+        // Update booking payment status
+        await storage.updateBookingPaymentStatus(bookingId, "paid", paymentIntent.id);
+        break;
           
-        case "payment_intent.payment_failed":
-          const failedPaymentIntent = event.data.object;
-          const failedBookingId = parseInt(failedPaymentIntent.metadata.bookingId, 10);
+      case "payment_intent.payment_failed":
+        const failedPaymentIntent = event.data.object;
+        const failedBookingId = parseInt(failedPaymentIntent.metadata.bookingId, 10);
           
-          // Update booking payment status
-          await storage.updateBookingPaymentStatus(failedBookingId, "failed", failedPaymentIntent.id);
-          break;
+        // Update booking payment status
+        await storage.updateBookingPaymentStatus(failedBookingId, "failed", failedPaymentIntent.id);
+        break;
       }
       
       res.json({ received: true });
