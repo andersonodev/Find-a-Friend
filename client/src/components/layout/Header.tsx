@@ -53,7 +53,7 @@ export default function Header({ user }: HeaderProps) {
               className="text-primary font-heading font-bold text-2xl cursor-pointer"
               onClick={() => navigate("/")}
             >
-              RentAFriend
+              Find a Friend
             </span>
           </div>
           

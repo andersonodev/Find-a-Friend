@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-lg font-bold mb-4">RentAFriend</h3>
+            <h3 className="text-lg font-bold mb-4">Find a Friend</h3>
             <p className="text-neutral-400 mb-4">
               Conectando pessoas e criando experiências memoráveis em todo o Brasil.
             </p>
@@ -126,7 +126,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li className="flex items-start">
                 <Mail className="h-5 w-5 mr-2 text-neutral-400" />
-                <span className="text-neutral-400">contato@rentafriend.com.br</span>
+                <span className="text-neutral-400">contato@findafriend.com.br</span>
               </li>
               <li className="flex items-start">
                 <Phone className="h-5 w-5 mr-2 text-neutral-400" />
@@ -142,7 +142,7 @@ export default function Footer() {
         
         <div className="border-t border-neutral-700 pt-8">
           <p className="text-center text-neutral-400 text-sm">
-            &copy; {new Date().getFullYear()} RentAFriend. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Find a Friend. Todos os direitos reservados.
           </p>
         </div>
       </div>

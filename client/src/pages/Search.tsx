@@ -6,11 +6,30 @@ import Footer from "@/components/layout/Footer";
 import SearchForm from "@/components/search/SearchForm";
 import FriendCard from "@/components/friend/FriendCard";
 import FilterDropdown from "@/components/filters/FilterDropdown";
+import LocationSearch from "@/components/maps/LocationSearch";
+import MapView from "@/components/maps/MapView";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Map, List, MapPin } from "lucide-react";
+
+// Interface para definir o formato dos amigos retornados da API
+interface Amigo {
+  id: number;
+  name: string;
+  location: string;
+  bio: string;
+  avatar: string;
+  isVerified: boolean;
+  averageRating: number;
+  reviewCount: number;
+  interests: string[];
+  hourlyRate: number;
+  // Outros campos que possam existir
+}
 
 export default function Search() {
-  const [location] = useLocation();
-  const searchParams = new URLSearchParams(location.split("?")[1] || "");
+  const [locationRoute, navigate] = useLocation();
+  const searchParams = new URLSearchParams(locationRoute.split("?")[1] || "");
   
   const locationParam = searchParams.get("location") || "";
   const interestParam = searchParams.get("interest") || "";
@@ -29,18 +48,21 @@ export default function Search() {
     apiUrl += `?${queryString}`;
   }
   
-  const { data: amigos = [], isLoading } = useQuery({
+  const { data: amigos = [] as Amigo[], isLoading } = useQuery<Amigo[]>({
     queryKey: [apiUrl],
     staleTime: 30000, // 30 seconds
   });
   
-  const [sortedAmigos, setSortedAmigos] = useState([]);
+  const [sortedAmigos, setSortedAmigos] = useState<Amigo[]>([]);
   const [sortValue, setSortValue] = useState("rating");
   const [filters, setFilters] = useState({
     verified: "all",
     minRating: "0"
   });
   const [visibleCount, setVisibleCount] = useState(8);
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [mapCenter, setMapCenter] = useState({ lat: -23.5505, lng: -46.6333 }); // São Paulo
+  const [selectedLocation, setSelectedLocation] = useState<{ address: string; lat: number; lng: number } | null>(null);
   
   // Apply sorting and filtering whenever amigos data changes
   useEffect(() => {
@@ -55,6 +77,12 @@ export default function Search() {
     
     if (parseInt(filters.minRating) > 0) {
       filtered = filtered.filter(amigo => amigo.averageRating >= parseInt(filters.minRating));
+    }
+    
+    // Filter by location distance if we have coordinates
+    if (selectedLocation) {
+      // Filter amigos based on proximity (fake distance calculation)
+      // In a real app, you would use more sophisticated geospatial queries
     }
     
     // Apply sorting
@@ -76,7 +104,7 @@ export default function Search() {
     }
     
     setSortedAmigos(filtered);
-  }, [amigos, sortValue, filters]);
+  }, [amigos, sortValue, filters, selectedLocation]);
   
   const handleSortChange = (value: string) => {
     setSortValue(value);
@@ -93,6 +121,30 @@ export default function Search() {
     setVisibleCount(prevCount => prevCount + 8);
   };
   
+  const handleLocationSelect = (location: { address: string; lat: number; lng: number }) => {
+    setSelectedLocation(location);
+    setMapCenter({ lat: location.lat, lng: location.lng });
+    
+    // Update the search URL with the new location
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("location", location.address);
+    navigate(`/search?${newParams.toString()}`);
+  };
+  
+  // Generate map markers from amigos data
+  const mapMarkers = sortedAmigos.map(amigo => {
+    // Generate random coordinates near the map center for demo
+    // In a real application, you would have actual coordinates from the database
+    const randomLat = mapCenter.lat + (Math.random() - 0.5) * 0.05;
+    const randomLng = mapCenter.lng + (Math.random() - 0.5) * 0.05;
+    
+    return {
+      position: { lat: randomLat, lng: randomLng },
+      title: amigo.name,
+      id: amigo.id
+    };
+  });
+  
   const visibleAmigos = sortedAmigos.slice(0, visibleCount);
   const hasMore = visibleCount < sortedAmigos.length;
   
@@ -108,7 +160,21 @@ export default function Search() {
       
       <section className="bg-primary py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <SearchForm />
+          <div className="flex flex-col gap-4">
+            <h1 className="text-2xl font-bold text-white">Find a Friend</h1>
+            
+            {/* Local search with Google Maps */}
+            <Card className="p-4">
+              <h2 className="text-lg font-medium mb-3">Encontrar amigos por localização</h2>
+              <LocationSearch 
+                onLocationSelect={handleLocationSelect} 
+                initialAddress={locationParam}
+              />
+            </Card>
+            
+            {/* Formulário de busca original */}
+            <SearchForm />
+          </div>
         </div>
       </section>
       
@@ -126,7 +192,28 @@ export default function Search() {
               </p>
             </div>
             
-            <div className="mt-4 md:mt-0">
+            <div className="mt-4 md:mt-0 flex gap-4 items-center">
+              <div className="flex border rounded-md overflow-hidden">
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  className="rounded-none"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="w-4 h-4 mr-2" />
+                  Lista
+                </Button>
+                <Button
+                  variant={viewMode === "map" ? "default" : "ghost"}
+                  size="sm"
+                  className="rounded-none"
+                  onClick={() => setViewMode("map")}
+                >
+                  <Map className="w-4 h-4 mr-2" />
+                  Mapa
+                </Button>
+              </div>
+              
               <FilterDropdown 
                 sortValue={sortValue} 
                 onSortChange={handleSortChange}
@@ -168,25 +255,83 @@ export default function Search() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {visibleAmigos.map((amigo) => (
-                  <FriendCard
-                    key={amigo.id}
-                    id={amigo.id}
-                    name={amigo.name}
-                    location={amigo.location}
-                    bio={amigo.bio}
-                    avatar={amigo.avatar}
-                    verified={amigo.isVerified}
-                    rating={amigo.averageRating}
-                    reviewCount={amigo.reviewCount}
-                    interests={amigo.interests}
-                    hourlyRate={amigo.hourlyRate}
-                  />
-                ))}
-              </div>
+              {viewMode === "list" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {visibleAmigos.map((amigo) => (
+                    <FriendCard
+                      key={amigo.id}
+                      id={amigo.id}
+                      name={amigo.name}
+                      location={amigo.location}
+                      bio={amigo.bio}
+                      avatar={amigo.avatar}
+                      verified={amigo.isVerified}
+                      rating={amigo.averageRating}
+                      reviewCount={amigo.reviewCount}
+                      interests={amigo.interests}
+                      hourlyRate={amigo.hourlyRate}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="w-full lg:w-1/3 flex flex-col gap-4 h-[600px] overflow-auto">
+                    {visibleAmigos.map((amigo) => (
+                      <Card key={amigo.id} className="p-3 hover:shadow-md transition-shadow">
+                        <div className="flex gap-3">
+                          <div className="rounded-full w-12 h-12 overflow-hidden flex-shrink-0">
+                            <img 
+                              src={amigo.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(amigo.name)}&background=random`} 
+                              alt={amigo.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex justify-between">
+                              <h3 className="font-medium">{amigo.name}</h3>
+                              <span className="text-sm font-medium text-primary">{`R$${amigo.hourlyRate}/h`}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground gap-1">
+                              <MapPin className="w-3 h-3" />
+                              <span>{amigo.location}</span>
+                            </div>
+                            <div className="mt-1">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="w-full"
+                                onClick={() => navigate(`/friend/${amigo.id}`)}
+                              >
+                                Ver perfil
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                  <div className="w-full lg:w-2/3 h-[600px]">
+                    <MapView 
+                      center={mapCenter}
+                      markers={mapMarkers}
+                      height="100%"
+                      width="100%"
+                      onMarkerClick={(marker) => {
+                        const amigoId = mapMarkers.find(
+                          m => m.position.lat === marker.getPosition()?.lat() &&
+                              m.position.lng === marker.getPosition()?.lng()
+                        )?.id;
+                        
+                        if (amigoId) {
+                          navigate(`/friend/${amigoId}`);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
               
-              {hasMore && (
+              {viewMode === "list" && hasMore && (
                 <div className="flex justify-center mt-12">
                   <Button 
                     variant="outline" 
