@@ -81,7 +81,7 @@ export default function Home({ user }: HomeProps) {
       <Header user={user} />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary via-primary to-blue-900 py-14 md:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 py-14 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMzUpIj48cmVjdCB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiIC8+PC9zdmc+')]"></div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-10">
@@ -89,7 +89,7 @@ export default function Home({ user }: HomeProps) {
               A forma mais fácil de encontrar companhia para qualquer momento
             </div>
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold text-white mb-6 leading-tight">
-              Encontre o <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-sky-300">amigo perfeito</span> para qualquer ocasião
+              Encontre o <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400">amigo perfeito</span> para qualquer ocasião
             </h1>
             <p className="text-white/90 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
               Companhia para eventos, shows, jantares, viagens ou apenas para conversar.

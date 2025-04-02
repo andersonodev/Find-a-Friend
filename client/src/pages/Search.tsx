@@ -158,22 +158,19 @@ export default function Search() {
     <div className="flex flex-col min-h-screen">
       <Header />
       
-      <section className="bg-primary py-8">
+      <section className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4">
             <h1 className="text-2xl font-bold text-white">Find a Friend</h1>
             
-            {/* Local search with Google Maps */}
-            <Card className="p-4">
-              <h2 className="text-lg font-medium mb-3">Encontrar amigos por localização</h2>
+            {/* Unified search form with location */}
+            <Card className="p-6 border-0 shadow-lg">
+              <h2 className="text-lg font-medium mb-4 text-emerald-800">Encontrar amigos por localização</h2>
               <LocationSearch 
                 onLocationSelect={handleLocationSelect} 
                 initialAddress={locationParam}
               />
             </Card>
-            
-            {/* Formulário de busca original */}
-            <SearchForm />
           </div>
         </div>
       </section>
