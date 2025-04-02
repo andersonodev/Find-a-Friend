@@ -3,26 +3,26 @@
 @tailwind utilities;
 
 :root {
-  /* Cores primárias - Verde (Equilíbrio, harmonia, crescimento) */
-  --color-primary: hsl(160, 84%, 29%);
-  --color-primary-light: hsl(160, 84%, 39%);
-  --color-primary-dark: hsl(160, 84%, 19%);
+  /* Cores primárias - Azul (Confiança, tranquilidade, profissionalismo, credibilidade) */
+  --color-primary: hsl(210, 100%, 40%);
+  --color-primary-light: hsl(210, 100%, 50%);
+  --color-primary-dark: hsl(210, 100%, 30%);
   
-  /* Cores secundárias - Amarelo (Otimismo, energia, alegria) */
-  --color-secondary: hsl(47, 100%, 68%);
-  --color-secondary-light: hsl(47, 100%, 78%);
-  --color-secondary-dark: hsl(47, 100%, 58%);
+  /* Cores secundárias - Púrpura (Criatividade, inovação, luxo, sabedoria) */
+  --color-secondary: hsl(280, 80%, 60%);
+  --color-secondary-light: hsl(280, 80%, 70%);
+  --color-secondary-dark: hsl(280, 80%, 50%);
   
-  /* Cores terciárias - Azul (Confiança, calma, segurança) */
-  --color-tertiary: hsl(195, 85%, 41%);
-  --color-tertiary-light: hsl(195, 85%, 51%);
-  --color-tertiary-dark: hsl(195, 85%, 31%);
+  /* Cores terciárias - Laranja (Entusiasmo, energia, juventude, sociabilidade) */
+  --color-tertiary: hsl(30, 100%, 60%);
+  --color-tertiary-light: hsl(30, 100%, 70%);
+  --color-tertiary-dark: hsl(30, 100%, 50%);
   
   /* Cores de suporte */
-  --color-success: hsl(145, 63%, 49%);
-  --color-warning: hsl(45, 100%, 51%);
-  --color-error: hsl(354, 70%, 54%);
-  --color-info: hsl(188, 78%, 41%);
+  --color-success: hsl(150, 80%, 45%); /* Verde esmeralda - equilíbrio, segurança */
+  --color-warning: hsl(40, 100%, 55%); /* Amarelo âmbar - atenção, otimismo */
+  --color-error: hsl(0, 85%, 60%);     /* Vermelho - urgência, importância */
+  --color-info: hsl(200, 85%, 50%);    /* Azul claro - informação, confiança */
 }
 
 /* Classes utilitárias de cores */
