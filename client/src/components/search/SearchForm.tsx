@@ -40,7 +40,7 @@ const SearchForm = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       location: "",
-      interest: "",
+      interest: "all",
       date: undefined,
     },
   });
@@ -52,7 +52,7 @@ const SearchForm = () => {
       params.append("location", values.location);
     }
     
-    if (values.interest) {
+    if (values.interest && values.interest !== "all") {
       params.append("interest", values.interest);
     }
     
@@ -148,7 +148,7 @@ const SearchForm = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Todos os interesses</SelectItem>
+                      <SelectItem value="all">Todos os interesses</SelectItem>
                       {interestOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
