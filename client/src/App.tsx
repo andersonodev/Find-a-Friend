@@ -12,6 +12,11 @@ import Checkout from "@/pages/Checkout";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Profile from "@/pages/Profile";
+import HowItWorks from "@/pages/HowItWorks";
+import BecomeAmigo from "@/pages/BecomeAmigo";
+import Help from "@/pages/Help";
+import Favorites from "@/pages/Favorites";
+import Bookings from "@/pages/Bookings";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -57,10 +62,11 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/profile" component={() => <Profile user={user} />} />
-      <Route path="/bookings" component={() => <Profile user={user} initialTab="bookings" />} />
-      <Route path="/how-it-works" component={() => <Home user={user} />} />
-      <Route path="/become-amigo" component={() => <Home user={user} />} />
-      <Route path="/help" component={NotFound} />
+      <Route path="/bookings" component={() => <Bookings user={user} />} />
+      <Route path="/favorites" component={() => <Favorites user={user} />} />
+      <Route path="/how-it-works" component={() => <HowItWorks user={user} />} />
+      <Route path="/become-amigo" component={() => <BecomeAmigo user={user} />} />
+      <Route path="/help" component={() => <Help user={user} />} />
       <Route component={NotFound} />
     </Switch>
   );
