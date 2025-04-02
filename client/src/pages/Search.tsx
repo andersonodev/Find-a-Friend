@@ -27,7 +27,7 @@ interface Amigo {
   // Outros campos que possam existir
 }
 
-export default function Search() {
+export default function Search({user}: {user?: any}) {
   const [locationRoute, navigate] = useLocation();
   const searchParams = new URLSearchParams(locationRoute.split("?")[1] || "");
   
@@ -156,16 +156,14 @@ export default function Search() {
   
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <Header user={user} />
       
-      <section className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 py-8">
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold text-white">Find a Friend</h1>
-            
             {/* Unified search form with location */}
             <Card className="p-6 border-0 shadow-lg">
-              <h2 className="text-lg font-medium mb-4 text-emerald-800">Encontrar amigos por localização</h2>
+              <h2 className="text-lg font-medium mb-4 text-blue-800">Encontrar amigos por localização</h2>
               <LocationSearch 
                 onLocationSelect={handleLocationSelect} 
                 initialAddress={locationParam}
