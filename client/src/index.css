@@ -19,10 +19,10 @@
   --color-tertiary-dark: hsl(30, 100%, 50%);
   
   /* Cores de suporte */
-  --color-success: hsl(150, 80%, 45%); /* Verde esmeralda - equilíbrio, segurança */
+  --color-success: hsl(195, 85%, 45%); /* Azul-turquesa - confiança, segurança */
   --color-warning: hsl(40, 100%, 55%); /* Amarelo âmbar - atenção, otimismo */
   --color-error: hsl(0, 85%, 60%);     /* Vermelho - urgência, importância */
-  --color-info: hsl(200, 85%, 50%);    /* Azul claro - informação, confiança */
+  --color-info: hsl(220, 85%, 55%);    /* Azul royal - informação, confiança */
 }
 
 /* Classes utilitárias de cores */
