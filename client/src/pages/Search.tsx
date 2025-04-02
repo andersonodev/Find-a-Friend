@@ -300,7 +300,7 @@ export default function Search() {
                                 size="sm" 
                                 variant="outline" 
                                 className="w-full"
-                                onClick={() => navigate(`/friend/${amigo.id}`)}
+                                onClick={() => navigate(`/amigos/${amigo.id}`)}
                               >
                                 Ver perfil
                               </Button>
@@ -323,7 +323,7 @@ export default function Search() {
                         )?.id;
                         
                         if (amigoId) {
-                          navigate(`/friend/${amigoId}`);
+                          navigate(`/amigos/${amigoId}`);
                         }
                       }}
                     />
