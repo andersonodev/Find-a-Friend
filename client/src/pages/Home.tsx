@@ -292,9 +292,7 @@ export default function Home({ user }: HomeProps) {
                   <Search size={24} />
                 </div>
               </div>
-              <div className="absolute top-20 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-primary/20 shadow-sm text-primary font-bold flex items-center justify-center z-10">
-                1
-              </div>
+
               <h3 className="text-xl font-heading font-bold text-neutral-800 mb-3">Busque</h3>
               <p className="text-neutral-600">Pesquise amigos por localização, interesses e disponibilidade para encontrar a combinação perfeita.</p>
             </div>
@@ -306,9 +304,7 @@ export default function Home({ user }: HomeProps) {
                   <Check size={24} />
                 </div>
               </div>
-              <div className="absolute top-20 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-primary/20 shadow-sm text-primary font-bold flex items-center justify-center z-10">
-                2
-              </div>
+
               <h3 className="text-xl font-heading font-bold text-neutral-800 mb-3">Reserve</h3>
               <p className="text-neutral-600">Escolha o amigo, defina a data, hora e local do encontro, e faça sua reserva com segurança.</p>
             </div>
@@ -320,9 +316,7 @@ export default function Home({ user }: HomeProps) {
                   <Edit size={24} />
                 </div>
               </div>
-              <div className="absolute top-20 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-primary/20 shadow-sm text-primary font-bold flex items-center justify-center z-10">
-                3
-              </div>
+
               <h3 className="text-xl font-heading font-bold text-neutral-800 mb-3">Avalie</h3>
               <p className="text-neutral-600">Após a experiência, deixe sua avaliação para ajudar a comunidade e melhorar o serviço.</p>
             </div>
