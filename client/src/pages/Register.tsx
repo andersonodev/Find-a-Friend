@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerWithEmail, updateUserProfile } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import {
   Form,
@@ -71,46 +70,27 @@ export default function Register() {
     try {
       setIsLoading(true);
       
-      // Create Firebase user account
-      const userCredential = await registerWithEmail(values.email, values.password);
-      
-      // Update display name
-      await updateUserProfile(values.name);
-      
-      try {
-        // Create user in our database
-        await apiRequest("POST", "/api/auth/register", {
-          username: values.username,
-          email: values.email,
-          password: values.password, // This would be hashed on the server
-          name: values.name,
-          isAmigo: accountType === "amigo",
-        });
-      } catch (dbError) {
-        console.error("Error creating user in database:", dbError);
-        // Continue anyway since Firebase auth worked
-      }
+      // Registrar usuário diretamente no banco de dados (sem depender do Firebase)
+      await apiRequest("POST", "/api/auth/register", {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        isAmigo: accountType === "amigo",
+      });
       
       toast({
         title: "Cadastro realizado com sucesso!",
-        description: "Bem-vindo ao RentAFriend.",
+        description: "Bem-vindo ao RentAFriend. Faça login para continuar.",
       });
       
-      navigate(redirectUrl);
+      // Redirect to login page
+      navigate(`/login${redirectUrl !== "/" ? `?redirect=${redirectUrl}` : ""}`);
     } catch (error: any) {
       let errorMessage = "Ocorreu um erro ao criar sua conta. Tente novamente.";
       
-      // Check for specific Firebase error codes
-      if (error.code === "auth/email-already-in-use") {
-        errorMessage = "Este email já está sendo usado por outra conta.";
-      } else if (error.code === "auth/weak-password") {
-        errorMessage = "A senha é muito fraca. Escolha uma senha mais forte.";
-      } else if (error.code === "auth/invalid-email") {
-        errorMessage = "O endereço de email é inválido.";
-      } else if (error.code === "auth/operation-not-allowed") {
-        errorMessage = "O registro com email e senha não está habilitado.";
-      } else if (error.code === "auth/network-request-failed") {
-        errorMessage = "Erro de conexão. Verifique sua conexão com a internet.";
+      if (error.message && error.message.includes("already exists")) {
+        errorMessage = "Este email ou nome de usuário já está sendo usado.";
       }
       
       toast({
@@ -120,6 +100,42 @@ export default function Register() {
       });
       
       console.error("Registration error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Registro rápido com Modo Demo
+  const handleDemoRegister = () => {
+    setIsLoading(true);
+    
+    try {
+      const demoUser = {
+        id: 999,
+        name: "Usuário Demo",
+        email: "demo@rentafriend.com",
+        avatar: null,
+        isAmigo: accountType === "amigo"
+      };
+      
+      // Store demo user in localStorage
+      localStorage.setItem("user", JSON.stringify(demoUser));
+      
+      toast({
+        title: "Conta de demonstração criada!",
+        description: "Você foi registrado e logado automaticamente no modo de demonstração.",
+        duration: 5000,
+      });
+      
+      // Redirect to home or requested page
+      navigate(redirectUrl);
+    } catch (error) {
+      toast({
+        title: "Falha no modo de demonstração",
+        description: "Não foi possível criar a conta de demonstração.",
+        variant: "destructive",
+      });
+      console.error("Erro ao criar demo:", error);
     } finally {
       setIsLoading(false);
     }
@@ -333,6 +349,7 @@ export default function Register() {
                 variant="outline"
                 className="w-full"
                 disabled={isLoading}
+                onClick={handleDemoRegister}
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path
@@ -353,7 +370,7 @@ export default function Register() {
                   />
                   <path d="M1 1h22v22H1z" fill="none" />
                 </svg>
-                Continuar com Google
+                Registrar no Modo Demo
               </Button>
             </CardContent>
             

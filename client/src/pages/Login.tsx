@@ -3,8 +3,8 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { loginWithEmail, loginWithGoogle } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import {
   Form,
   FormControl,
@@ -52,12 +52,27 @@ export default function Login() {
     },
   });
   
-  // Handle form submission
+  // Handle form submission - login with our backend directly (no Firebase)
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     
     try {
-      await loginWithEmail(values.email, values.password);
+      // Login using our backend API instead of Firebase
+      const response = await apiRequest("POST", "/api/auth/login", {
+        email: values.email,
+        password: values.password
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Falha na autenticação");
+      }
+      
+      // Login successful
+      const userData = await response.json();
+      
+      // Store user data in localStorage for session management
+      localStorage.setItem("user", JSON.stringify(userData));
       
       toast({
         title: "Login realizado com sucesso!",
@@ -66,20 +81,7 @@ export default function Login() {
       
       navigate(redirectUrl);
     } catch (error: any) {
-      let errorMessage = "Ocorreu um erro ao fazer login. Tente novamente.";
-      
-      // Check for specific Firebase error codes
-      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-        errorMessage = "Email ou senha incorretos. Verifique suas credenciais.";
-      } else if (error.code === "auth/too-many-requests") {
-        errorMessage = "Muitas tentativas de login. Tente novamente mais tarde.";
-      } else if (error.code === "auth/invalid-email") {
-        errorMessage = "O endereço de email é inválido.";
-      } else if (error.code === "auth/network-request-failed") {
-        errorMessage = "Erro de conexão. Verifique sua conexão com a internet.";
-      } else if (error.code === "auth/configuration-not-found") {
-        errorMessage = "Erro de configuração. O método de login escolhido não está disponível.";
-      }
+      let errorMessage = "Email ou senha incorretos. Verifique suas credenciais.";
       
       toast({
         title: "Falha no login",
@@ -93,39 +95,37 @@ export default function Login() {
     }
   };
   
-  // Login com Google
-  const handleGoogleLogin = async () => {
+  // Login com modo de demonstração (bypass de autenticação)
+  const handleDemoLogin = async () => {
     setIsGoogleLoading(true);
     
     try {
-      await loginWithGoogle();
+      // Criar um usuário de demonstração
+      const demoUser = {
+        id: 999,
+        name: "Usuário Demo",
+        email: "demo@rentafriend.com",
+        avatar: null,
+        isAmigo: false
+      };
+      
+      // Armazenar usuário de demonstração no localStorage
+      localStorage.setItem("user", JSON.stringify(demoUser));
       
       toast({
-        title: "Login com Google realizado com sucesso!",
-        description: "Bem-vindo de volta ao RentAFriend.",
+        title: "Login de demonstração ativado!",
+        description: "Você está usando uma conta de demonstração.",
       });
       
       navigate(redirectUrl);
-    } catch (error: any) {
-      let errorMessage = "Ocorreu um erro ao fazer login com Google. Tente novamente.";
-      
-      if (error.code === "auth/popup-closed-by-user") {
-        errorMessage = "Login cancelado. Você fechou a janela de login.";
-      } else if (error.code === "auth/popup-blocked") {
-        errorMessage = "Popup bloqueado. Por favor, permita popups para este site.";
-      } else if (error.code === "auth/cancelled-popup-request") {
-        errorMessage = "Operação cancelada. Tente novamente.";
-      } else if (error.code === "auth/configuration-not-found") {
-        errorMessage = "Erro de configuração. O login com Google não está configurado corretamente.";
-      }
-      
+    } catch (error) {
       toast({
-        title: "Falha no login com Google",
-        description: errorMessage,
+        title: "Falha no modo de demonstração",
+        description: "Não foi possível ativar o modo de demonstração.",
         variant: "destructive",
       });
       
-      console.error("Erro de login com Google:", error);
+      console.error("Erro ao ativar modo demo:", error);
     } finally {
       setIsGoogleLoading(false);
     }
@@ -255,7 +255,7 @@ export default function Login() {
                 variant="outline"
                 className="w-full"
                 disabled={isLoading || isGoogleLoading}
-                onClick={handleGoogleLogin}
+                onClick={handleDemoLogin}
               >
                 {isGoogleLoading ? (
                   <div className="flex items-center justify-center">
@@ -283,7 +283,7 @@ export default function Login() {
                       />
                       <path d="M1 1h22v22H1z" fill="none" />
                     </svg>
-                    Continuar com Google
+                    Continuar no Modo Demo
                   </>
                 )}
               </Button>
