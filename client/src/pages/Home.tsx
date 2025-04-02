@@ -50,8 +50,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export default function Home() {
-  const { data: amigos = [], isLoading } = useQuery({
+interface HomeProps {
+  user?: any | null;
+}
+
+export default function Home({ user }: HomeProps) {
+  interface Amigo {
+    id: number;
+    name: string;
+    location: string;
+    bio: string;
+    avatar: string;
+    isVerified: boolean;
+    averageRating: number;
+    reviewCount: number;
+    interests: string[];
+    hourlyRate: number;
+  }
+
+  const { data: amigos = [], isLoading } = useQuery<Amigo[]>({
     queryKey: ['/api/amigos'],
     staleTime: 60000, // 1 minute
   });
@@ -61,7 +78,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <Header user={user} />
       
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary via-primary to-blue-900 py-14 md:py-24 relative overflow-hidden">

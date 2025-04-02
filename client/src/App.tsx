@@ -19,6 +19,8 @@ import Favorites from "@/pages/Favorites";
 import Bookings from "@/pages/Bookings";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import SecurityShield from "@/components/security/SecurityShield";
+import DynamicWatermark from "@/components/security/DynamicWatermark";
 
 function Router() {
   const [user, setUser] = useState<any>(null);
@@ -54,29 +56,71 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/" component={() => <Home user={user} />} />
+      <Route path="/">
+        {() => <Home user={user} />}
+      </Route>
       <Route path="/search" component={Search} />
       <Route path="/amigos/:id" component={FriendDetail} />
-      <Route path="/booking/:id" component={() => <Booking user={user} />} />
-      <Route path="/checkout/:id" component={() => <Checkout user={user} />} />
+      <Route path="/booking/:id">
+        {() => <Booking user={user} />}
+      </Route>
+      <Route path="/checkout/:id">
+        {() => <Checkout user={user} />}
+      </Route>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
-      <Route path="/profile" component={() => <Profile user={user} />} />
-      <Route path="/bookings" component={() => <Bookings user={user} />} />
-      <Route path="/favorites" component={() => <Favorites user={user} />} />
-      <Route path="/how-it-works" component={() => <HowItWorks user={user} />} />
-      <Route path="/become-amigo" component={() => <BecomeAmigo user={user} />} />
-      <Route path="/help" component={() => <Help user={user} />} />
-      <Route component={NotFound} />
+      <Route path="/profile">
+        {() => <Profile user={user} />}
+      </Route>
+      <Route path="/bookings">
+        {() => <Bookings user={user} />}
+      </Route>
+      <Route path="/favorites">
+        {() => <Favorites user={user} />}
+      </Route>
+      <Route path="/how-it-works">
+        {() => <HowItWorks user={user} />}
+      </Route>
+      <Route path="/become-amigo">
+        {() => <BecomeAmigo user={user} />}
+      </Route>
+      <Route path="/help">
+        {() => <Help user={user} />}
+      </Route>
+      <Route>
+        {() => <NotFound />}
+      </Route>
     </Switch>
   );
 }
 
 function App() {
+  const [securityEnabled, setSecurityEnabled] = useState(false);
+  
+  useEffect(() => {
+    // Ativar medidas de segurança apenas em ambiente de produção
+    // ou quando explicitamente solicitado via localStorage
+    const isProd = import.meta.env.PROD;
+    const forceSecurity = localStorage.getItem('forceSecurity') === 'true';
+    
+    if (isProd || forceSecurity) {
+      setSecurityEnabled(true);
+      console.log("Medidas de segurança ativadas");
+    } else {
+      console.log("Medidas de segurança não ativadas em ambiente de desenvolvimento");
+    }
+  }, []);
+  
   return (
     <QueryClientProvider client={queryClient}>
       <Router />
       <Toaster />
+      {securityEnabled && (
+        <>
+          <SecurityShield />
+          <DynamicWatermark />
+        </>
+      )}
     </QueryClientProvider>
   );
 }
