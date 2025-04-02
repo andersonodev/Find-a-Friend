@@ -1,6 +1,6 @@
-import { pool } from './db.js';
+import { pool } from './server/db.js';
 import { faker } from '@faker-js/faker/locale/pt_BR';
-import { users } from '../shared/schema.js';
+import { users } from './shared/schema.js';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
 // Configure faker
@@ -189,7 +189,7 @@ function gerarAmigo(): AmigoData {
   };
 }
 
-// Função para inserir os amigos no banco de dados
+// Função principal para inserir os amigos no banco de dados
 async function inserirAmigos(quantidade: number) {
   console.log(`Iniciando geração de ${quantidade} amigos...`);
   
@@ -247,5 +247,14 @@ async function inserirAmigos(quantidade: number) {
   }
 }
 
-// Exportar a função
-export { inserirAmigos };
+// Executar o processo
+console.log('Iniciando a inserção de 300 amigos...');
+inserirAmigos(300)
+  .then(() => {
+    console.log('Processo concluído com sucesso!');
+    process.exit(0);
+  })
+  .catch(error => {
+    console.error('Erro ao executar script de seed:', error);
+    process.exit(1);
+  });

@@ -17,6 +17,9 @@ export const users = pgTable("users", {
   hourlyRate: integer("hourly_rate"),
   stripeCustomerId: text("stripe_customer_id"),
   createdAt: timestamp("created_at").defaultNow(),
+  about: text("about"),
+  reviewCount: integer("review_count").default(0),
+  averageRating: doublePrecision("average_rating").default(0)
 });
 
 export const availability = pgTable("availability", {

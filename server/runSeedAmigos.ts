@@ -1,7 +1,7 @@
-import { inserirAmigos } from './seedAmigos';
+import { inserirAmigos } from './seedAmigos.js';
 
 // Número de amigos a serem criados
-const NUM_AMIGOS = 1000;
+const NUM_AMIGOS = 300;
 
 // Iniciar o processo de criação de amigos
 console.log(`Iniciando a criação de ${NUM_AMIGOS} amigos...`);

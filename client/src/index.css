@@ -2,6 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Cores primárias - Verde (Equilíbrio, harmonia, crescimento) */
+  --color-primary: hsl(160, 84%, 29%);
+  --color-primary-light: hsl(160, 84%, 39%);
+  --color-primary-dark: hsl(160, 84%, 19%);
+  
+  /* Cores secundárias - Amarelo (Otimismo, energia, alegria) */
+  --color-secondary: hsl(47, 100%, 68%);
+  --color-secondary-light: hsl(47, 100%, 78%);
+  --color-secondary-dark: hsl(47, 100%, 58%);
+  
+  /* Cores terciárias - Azul (Confiança, calma, segurança) */
+  --color-tertiary: hsl(195, 85%, 41%);
+  --color-tertiary-light: hsl(195, 85%, 51%);
+  --color-tertiary-dark: hsl(195, 85%, 31%);
+  
+  /* Cores de suporte */
+  --color-success: hsl(145, 63%, 49%);
+  --color-warning: hsl(45, 100%, 51%);
+  --color-error: hsl(354, 70%, 54%);
+  --color-info: hsl(188, 78%, 41%);
+}
+
+/* Classes utilitárias de cores */
+.bg-gradient-primary {
+  background: linear-gradient(to right, var(--color-primary-dark), var(--color-primary));
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(to right, var(--color-secondary-dark), var(--color-secondary));
+}
+
+.bg-gradient-tertiary {
+  background: linear-gradient(to right, var(--color-tertiary-dark), var(--color-tertiary));
+}
+
+.text-gradient-primary {
+  background-image: linear-gradient(to right, var(--color-primary-dark), var(--color-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.text-gradient-secondary {
+  background-image: linear-gradient(to right, var(--color-secondary-dark), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.text-gradient-tertiary {
+  background-image: linear-gradient(to right, var(--color-tertiary-dark), var(--color-tertiary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
 @layer base {
   * {
     @apply border-border;
