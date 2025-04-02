@@ -1,4 +1,4 @@
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, Clock, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -33,7 +33,7 @@ export default function FriendCard({
   const displayName = age ? `${name}, ${age}` : name;
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 h-full">
       <div className="relative">
         <img
           src={avatar}
@@ -42,67 +42,58 @@ export default function FriendCard({
         />
         {verified && (
           <div className="absolute bottom-3 left-3 flex items-center">
-            <Badge variant="verified" className="flex items-center gap-1 px-2 py-1 rounded-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
+            <Badge variant="verified" className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+              <Check className="h-3 w-3 mr-1" />
               Verificado
             </Badge>
           </div>
         )}
+        <div className="absolute top-3 right-3">
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-primary font-medium text-xs shadow-sm">
+            <Star className="h-3 w-3 text-[#FFB400]" fill="#FFB400" />
+            {rating.toFixed(1)}
+          </div>
+        </div>
       </div>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="font-heading font-bold text-lg text-neutral-800">
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="font-heading font-bold text-xl text-neutral-800">
             {displayName}
           </h3>
-          <div className="flex items-center">
-            <div className="flex text-[#FFB400]">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="h-4 w-4"
-                  fill="currentColor"
-                />
-              ))}
-            </div>
-            <span className="text-neutral-600 text-xs ml-1">
-              {reviewCount} avaliações
-            </span>
+          <div className="text-[#FFB400] text-xs bg-amber-50 px-2 py-1 rounded-md flex items-center">
+            <Star className="h-3 w-3 mr-1" fill="currentColor" />
+            {reviewCount} avaliações
           </div>
         </div>
         <div className="flex items-center text-sm text-neutral-600 mb-3">
-          <MapPin className="h-4 w-4 mr-1" />
+          <MapPin className="h-4 w-4 mr-1 text-primary" />
           {location}
         </div>
         <div className="mb-4">
-          <p className="text-neutral-700 text-sm">{bio}</p>
+          <p className="text-neutral-700 text-sm line-clamp-2">{bio}</p>
         </div>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {interests.map((interest) => (
-            <Badge key={interest} variant="interest" className="px-2 py-1 rounded-full text-xs">
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          {interests.slice(0, 3).map((interest) => (
+            <Badge key={interest} variant="interest" className="px-2 py-1 rounded-full text-xs bg-primary/5 text-primary border-primary/10">
               {interest}
             </Badge>
           ))}
+          {interests.length > 3 && (
+            <Badge variant="interest" className="px-2 py-1 rounded-full text-xs bg-neutral-100 text-neutral-600">
+              +{interests.length - 3} mais
+            </Badge>
+          )}
         </div>
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+          <div className="flex items-center">
+            <Clock className="h-4 w-4 text-primary mr-1.5" />
             <span className="text-neutral-800 font-semibold">
               R$ {hourlyRate}
             </span>
             <span className="text-neutral-600 text-sm"> / hora</span>
           </div>
           <Link href={`/amigos/${id}`}>
-            <Button className="bg-primary hover:bg-primary/90 text-white font-medium text-sm py-2 px-4 rounded-md transition">
+            <Button className="bg-primary hover:bg-primary/90 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm hover:shadow">
               Reservar
             </Button>
           </Link>
