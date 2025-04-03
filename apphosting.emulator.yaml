@@ -1,3 +1,6 @@
+runtime: nodejs18
+entrypoint: npm run dev
+
 env:
 #- variable: ENV_VAR_NAME
 #  value: plaintext value

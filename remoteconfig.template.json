@@ -1,1 +1,9 @@
-{}
+{
+  "parameters": {
+    "welcome_message": {
+      "defaultValue": {
+        "value": "Welcome to Find-a-Friend!"
+      }
+    }
+  }
+}
