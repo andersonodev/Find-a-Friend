@@ -1,9 +1,9 @@
-import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey().autoIncrement(),
   email: text("email").notNull().unique(),
   username: text("username").notNull(),
   password: text("password").notNull(),
@@ -11,48 +11,48 @@ export const users = pgTable("users", {
   bio: text("bio"),
   location: text("location"),
   avatar: text("avatar"),
-  isVerified: boolean("is_verified").default(false),
-  isAmigo: boolean("is_amigo").default(false),
+  isVerified: integer("is_verified").default(0),
+  isAmigo: integer("is_amigo").default(0),
   interests: text("interests").array(),
   hourlyRate: integer("hourly_rate"),
   stripeCustomerId: text("stripe_customer_id"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
   about: text("about"),
   reviewCount: integer("review_count").default(0),
-  averageRating: doublePrecision("average_rating").default(0)
+  averageRating: real("average_rating").default(0),
 });
 
-export const availability = pgTable("availability", {
-  id: serial("id").primaryKey(),
+export const availability = sqliteTable("availability", {
+  id: integer("id").primaryKey().autoIncrement(),
   userId: integer("user_id").notNull().references(() => users.id),
-  date: timestamp("date").notNull(),
-  startTime: timestamp("start_time").notNull(),
-  endTime: timestamp("end_time").notNull(),
+  date: text("date").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
 });
 
-export const bookings = pgTable("bookings", {
-  id: serial("id").primaryKey(),
+export const bookings = sqliteTable("bookings", {
+  id: integer("id").primaryKey().autoIncrement(),
   clientId: integer("client_id").notNull().references(() => users.id),
   amigoId: integer("amigo_id").notNull().references(() => users.id),
-  date: timestamp("date").notNull(),
-  startTime: timestamp("start_time").notNull(),
-  endTime: timestamp("end_time").notNull(),
+  date: text("date").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
   location: text("location").notNull(),
   status: text("status").notNull().default("pending"),
   totalAmount: integer("total_amount").notNull(),
   paymentStatus: text("payment_status").notNull().default("pending"),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });
 
-export const reviews = pgTable("reviews", {
-  id: serial("id").primaryKey(),
+export const reviews = sqliteTable("reviews", {
+  id: integer("id").primaryKey().autoIncrement(),
   bookingId: integer("booking_id").notNull().references(() => bookings.id),
   reviewerId: integer("reviewer_id").notNull().references(() => users.id),
   revieweeId: integer("reviewee_id").notNull().references(() => users.id),
   rating: integer("rating").notNull(),
   comment: text("comment"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });
 
 // Insert schemas

@@ -1,7 +1,6 @@
-import { pool } from './db.js';
-import { faker } from '@faker-js/faker/locale/pt_BR';
-import { users } from '../shared/schema.js';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { db } from "./db";
+import { faker } from "@faker-js/faker";
+import { users } from "../shared/schema";
 
 // Configure faker
 faker.seed(123);
@@ -192,59 +191,29 @@ function gerarAmigo(): AmigoData {
 // Função para inserir os amigos no banco de dados
 async function inserirAmigos(quantidade: number) {
   console.log(`Iniciando geração de ${quantidade} amigos...`);
-  
-  // Criar conexão com o banco de dados
-  const db = drizzle(pool);
-  
-  try {
-    // Gerar amigos
-    const amigosGerados: AmigoData[] = [];
-    for (let i = 0; i < quantidade; i++) {
-      amigosGerados.push(gerarAmigo());
-      
-      // Mostrar progresso a cada 50 amigos
-      if ((i + 1) % 50 === 0) {
-        console.log(`Gerados ${i + 1} amigos...`);
-      }
-    }
-    
-    console.log('Todos os amigos foram gerados. Iniciando inserção no banco de dados...');
-    
-    // Inserir no banco em lotes de 50 para não sobrecarregar
-    const loteSize = 50;
-    for (let i = 0; i < amigosGerados.length; i += loteSize) {
-      const loteAtual = amigosGerados.slice(i, i + loteSize);
-      
-      // Inserir lote no banco
-      await db.insert(users).values(
-        loteAtual.map(amigo => ({
-          email: amigo.email,
-          username: amigo.email.split('@')[0],
-          password: amigo.password, // Em produção deveria ser hash
-          name: amigo.name,
-          bio: amigo.bio,
-          avatar: amigo.avatar,
-          location: amigo.location,
-          interests: amigo.interests,
-          isAmigo: amigo.isAmigo,
-          isVerified: amigo.isVerified,
-          hourlyRate: amigo.hourlyRate,
-          about: amigo.about,
-          reviewCount: amigo.reviewCount,
-          averageRating: amigo.averageRating
-        }))
-      );
-      
-      console.log(`Inseridos ${Math.min(i + loteSize, amigosGerados.length)} amigos de ${amigosGerados.length}`);
-    }
-    
-    console.log('Processo de geração e inserção de amigos concluído com sucesso!');
-  } catch (error) {
-    console.error('Erro ao inserir amigos:', error);
-  } finally {
-    // Garantir que a conexão seja fechada
-    await pool.end();
+
+  const amigosGerados = Array.from({ length: quantidade }, () => ({
+    email: faker.internet.email(),
+    username: faker.internet.userName(),
+    password: faker.internet.password(),
+    name: faker.name.fullName(),
+    bio: faker.lorem.sentence(),
+    location: faker.address.city(),
+    avatar: faker.image.avatar(),
+    isVerified: faker.datatype.boolean(),
+    isAmigo: true,
+    interests: faker.helpers.arrayElements(["Música", "Cinema", "Esportes"]),
+    hourlyRate: faker.datatype.number({ min: 50, max: 200 }),
+    about: faker.lorem.paragraph(),
+    reviewCount: faker.datatype.number({ min: 0, max: 100 }),
+    averageRating: faker.datatype.float({ min: 0, max: 5 }),
+  }));
+
+  for (const amigo of amigosGerados) {
+    await db.insert(users).values(amigo);
   }
+
+  console.log("Amigos inseridos com sucesso!");
 }
 
 // Exportar a função

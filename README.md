@@ -8,7 +8,6 @@ Find-a-Friend é uma aplicação para conectar pessoas com interesses em comum. 
 ### Pré-requisitos
 - Node.js v20 ou superior
 - PostgreSQL
-- Firebase CLI (para configurar serviços do Firebase)
 
 ### Passos para Configuração
 
@@ -27,25 +26,19 @@ Find-a-Friend é uma aplicação para conectar pessoas com interesses em comum. 
    - Renomeie o arquivo `.env.example` para `.env`.
    - Preencha as variáveis de ambiente no arquivo `.env` com suas chaves apropriadas.
 
-4. Configure o Firebase:
-   - Execute o comando `firebase login` para autenticar.
-   - Inicialize o Firebase no projeto:
-     ```bash
-     firebase init
-     ```
-   - Selecione os serviços necessários, como Firestore, Authentication e Hosting.
-
-5. Execute as migrações do banco de dados:
+4. Execute as migrações do banco de dados:
    ```bash
    npm run db:push
    ```
 
-6. Inicie o servidor de desenvolvimento:
+5. Inicie o projeto:
    ```bash
    npm run dev
    ```
 
-7. (Opcional) Execute os testes:
+6. Acesse o cliente em [http://localhost:3000](http://localhost:3000).
+
+6. (Opcional) Execute os testes:
    ```bash
    npm test
    ```
@@ -66,4 +59,3 @@ Find-a-Friend é uma aplicação para conectar pessoas com interesses em comum. 
 - Drizzle ORM
 - React
 - TailwindCSS
-- Firebase
